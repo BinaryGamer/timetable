@@ -70,14 +70,17 @@ def make():
     storedData = get_data().json()
     data = request.get_json()
     author = data['author'] or 'liam'
-    if 'will' in data['text'] or 'yes' in data['text'] or 'can ' in data['text'] or 'yeet' in data['text']:
+    text = data['text']
+    if 'will' in text or 'yes' in text or 'can ' in text or 'yeet' in text or 'affirm' in text or 'sure' in text or 'sounds good' in text or 'sounds like a plan' in text or 'fine' in text:
       weekend = True
+      phraseyboi = 'will'
     else:
       weekend = False
+      phraseyboi = 'won\'t'
     storedData[author]['weekends'] = weekend
     post_data(storedData)
     message = {
-      'text': f'Ok, what times do you want to study?',
+      'text': f'Ok, you {phraseyboi} study on weekends, what times do you want to study?',
       'author': 'Timetabler',
       'state': 'times'
     }
@@ -96,6 +99,8 @@ def make():
       time2 = int(times[2][0:-2])*100
     else:
       time2 = int(times[2][0:-2])*100+1200
+    if time2 <= time1:
+      return jsonify({'text':'hey there fine human, it seems that you are trying to study past midnight, this is bad for your mental and physical health, so I am saying no.', 'state': 'times', 'author':'Timetabler'})
     storedData[author]['time'] = [time1, time2]
     post_data(storedData)
     message = {
