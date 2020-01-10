@@ -3,17 +3,14 @@ import re
 from pprint import pprint
 import requests
 from flask import Flask, jsonify, request
+
 app = Flask('app')
 
-
-
-
-
-database = 'https://store.ncss.cloud/melb/g3/flex/tt'
-
+database = 'https://store.ncss.cloud/mel-group3-studybot-planner'
 
 def get_data():
   return requests.get(database)
+
 def post_data(data):
   return requests.post(database, json=data)
 
@@ -22,11 +19,12 @@ def reset_data():
   data = {
   "frank":{"subjects":{"english":4, "physics":7, "maths":10},
            "weekends": True, 
-           "study": [900,1500]
+           "study": ['9:00am','3:00pm']
   }
   }
   if k == 'y':
     post_data(data)
+
 reset_data()
 
 @app.route('/make', methods=['POST'])
@@ -44,7 +42,6 @@ def make():
   }
   return jsonify(message)
 
-
 @app.route('/subjects', methods=['POST'])
 def subjects():
   storedData = get_data().json()
@@ -53,14 +50,11 @@ def subjects():
   author = data['author']
   if author not in storedData:
     return jsonify({'text': 'please start from the beginning, no jumping the line. (type make a timetable)',
-    'author': 'Timetabler'})
-  
-  
+    'author': 'Timetabler'})  
   subjects = {}
   for sub in subs:
     sub = sub.split(' for ')
     subjects[sub[0]] = sub[1].split()[0]
-  
   pprint(subjects)
   storedData[author]['subjects'] = subjects
   post_data(storedData)
@@ -88,7 +82,6 @@ def weekend():
     'text': f'Ok, what times do you want to study?',
     'author': 'Timetabler'
   }
-  
   return jsonify(message)
 
 @app.route('/times', methods=['POST'])
