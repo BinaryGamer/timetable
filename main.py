@@ -18,7 +18,7 @@ def reset_data():
   k = input("Are you sure? (y/n) ")
   data = {
   "frank":{"subjects":{"english":4, "physics":7, "maths":10},
-           "weekends": True, 
+           "weekends": False, 
            "study": ['9:00am','3:00pm']
   }
   }
@@ -27,6 +27,7 @@ def reset_data():
 
 reset_data()
 
+#make( me)* a timetable
 @app.route('/make', methods=['POST'])
 def make():
   storedData = get_data().json()
@@ -42,6 +43,7 @@ def make():
   }
   return jsonify(message)
 
+#I would like to study (?P<subs>.*)$
 @app.route('/subjects', methods=['POST'])
 def subjects():
   storedData = get_data().json()
@@ -64,7 +66,8 @@ def subjects():
     'author': 'Timetabler'
   }
   return jsonify(message)
-
+#nice
+#i [^ ]* study on weekends
 @app.route('/weekend', methods=['POST'])
 def weekend():
   storedData = get_data().json()
@@ -87,5 +90,12 @@ def weekend():
 @app.route('/times', methods=['POST'])
 def times():
   return ('yay')
+
+@app.route('/timetable', methods=['POST'])
+def timetable():
+  storedData = get_data().json()
+  data = request.get_json()
+  author = data['author']
+  return jsonify({'text': author})
 
 app.run(host='0.0.0.0', port=8080)
