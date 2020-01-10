@@ -70,7 +70,7 @@ def make():
     storedData = get_data().json()
     data = request.get_json()
     author = data['author'] or 'liam'
-    if 'will' in data['text'] or 'yes' in data['text'] or 'can ' in data['text']:
+    if 'will' in data['text'] or 'yes' in data['text'] or 'can ' in data['text'] or 'yeet' in data['text']:
       weekend = True
     else:
       weekend = False
@@ -78,10 +78,31 @@ def make():
     post_data(storedData)
     message = {
       'text': f'Ok, what times do you want to study?',
+      'author': 'Timetabler',
+      'state': 'times'
+    }
+    return jsonify(message)
+  elif state == 'times':
+    storedData = get_data().json()
+    data = request.get_json()
+    author = data['author'] or 'liam'
+    times = data['text']
+    times = times.split()
+    if times[0][-2:] == 'am':
+      time1 = int(times[0][0:-2])*100
+    else:
+      time1 = int(times[0][0:-2])*100+1200
+    if times[2][-2:] == 'am':
+      time2 = int(times[2][0:-2])*100
+    else:
+      time2 = int(times[2][0:-2])*100+1200
+    storedData[author]['time'] = [time1, time2]
+    post_data(storedData)
+    message = {
+      'text': 'Ok, please type print timetable to see your timetable!!',
       'author': 'Timetabler'
     }
     return jsonify(message)
-
 
 app.run(host='0.0.0.0', port=8080)
 
