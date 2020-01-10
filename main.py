@@ -19,7 +19,7 @@ def reset_data():
   data = {
   "frank":{"subjects":{"english":4, "physics":7, "maths":10},
            "weekends": False, 
-           "study": ['9:00am','3:00pm']
+           "study": [900, 1500]
   }
   }
   if k == 'y':
@@ -32,17 +32,116 @@ reset_data()
 def make():
   storedData = get_data().json()
   data = request.get_json()
-  author = data['author']
-  storedData[author] = {}
-  post_data(storedData)
-  phrases = ["Ok human, i hear you\'re looking to make a timetable ey? i\'ve seen many a travellers try, but none return, luckily you have me to help you!", "Goodevening fine human, i have heard over the airways that you are trying to make a timetable! I have taken it upon myself to help you with this.", "Why hello there human, It is my pleasure to make your acquaintance."]
-  intro = random.choice(phrases)
-  message = {
-    'text': f'{intro} Please enter your subjects and how long you want to study them for {author}.',
-    'author': 'Timetabler'
-  }
-  return jsonify(message)
+  print(data)
+  author = data['author'] or 'liam'
+  if 'state' not in data:
+    storedData[author] = {}
+    post_data(storedData)
+    phrases = ["Ok human, i hear you\'re looking to make a timetable ey? i\'ve seen many a travellers try, but none return, luckily you have me to help you!", "Goodevening fine human, i have heard over the airways that you are trying to make a timetable! I have taken it upon myself to help you with this.", "Why hello there human, It is my pleasure to make your acquaintance."]
+    intro = random.choice(phrases)
+    message = {
+      'text': f'{intro} Please enter your subjects and how long you want to study them for {author}.',
+      'author': 'Timetabler',
+      'state': 'subjects'
+    }
+    return jsonify(message)
+  state = data['state']
+  if state == 'subjects':
+    storedData = get_data().json()
+    data = request.get_json()
+    subs = re.split(', | and ', data['text'])
+    print(subs)
+    subjects = {}
+    for sub in subs:
+      sub = sub.split(' for ')
+      subjects[sub[0]] = sub[1].split()[0]
+    pprint(subjects)
+    print(author, author in storedData, storedData)
+    storedData[author]['subjects'] = subjects
+    post_data(storedData)
+  # pprint(data)
+    message = {
+      'text': f'Ok, subjects entered {author}.Would you like to study on weekends?',
+      'author': 'Timetabler',
+      'state': 'weekend'
+    }
+    return jsonify(message)  
+  elif state == 'weekend':
+    storedData = get_data().json()
+    data = request.get_json()
+    author = data['author'] or 'liam'
+    if 'will' in data['text'] or 'yes' in data['text'] or 'can ' in data['text']:
+      weekend = True
+    else:
+      weekend = False
+    storedData[author]['weekends'] = weekend
+    post_data(storedData)
+    message = {
+      'text': f'Ok, what times do you want to study?',
+      'author': 'Timetabler'
+    }
+    return jsonify(message)
 
+
+app.run(host='0.0.0.0', port=8080)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 #I would like to study (?P<subs>.*)$
 @app.route('/subjects', methods=['POST'])
 def subjects():
@@ -66,7 +165,6 @@ def subjects():
     'author': 'Timetabler'
   }
   return jsonify(message)
-#nice
 #i [^ ]* study on weekends
 @app.route('/weekend', methods=['POST'])
 def weekend():
@@ -86,16 +184,4 @@ def weekend():
     'author': 'Timetabler'
   }
   return jsonify(message)
-
-@app.route('/times', methods=['POST'])
-def times():
-  return ('yay')
-
-@app.route('/timetable', methods=['POST'])
-def timetable():
-  storedData = get_data().json()
-  data = request.get_json()
-  author = data['author']
-  return jsonify({'text': author})
-
-app.run(host='0.0.0.0', port=8080)
+"""
