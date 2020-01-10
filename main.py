@@ -66,7 +66,7 @@ def make():
       'state': 'weekend'
     }
     return jsonify(message)  
-  elif state == 'weekend':
+  elif state == 'weekend': #nice
     storedData = get_data().json()
     data = request.get_json()
     author = data['author'] or 'liam'
