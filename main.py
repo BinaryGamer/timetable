@@ -26,15 +26,14 @@ def reset_data():
     post_data(data)
 
 reset_data()
-
 #make( me)* a timetable
 @app.route('/make', methods=['POST'])
 def make():
   storedData = get_data().json()
   data = request.get_json()
   print(data)
-  author = data['author'] or 'liam'
-  if 'state' not in data:
+  if 'state' not in data:   
+    author = data['author']
     storedData[author] = {}
     post_data(storedData)
     phrases = ["Ok human, i hear you\'re looking to make a timetable ey? i\'ve seen many a travellers try, but none return, luckily you have me to help you!", "Goodevening fine human, i have heard over the airways that you are trying to make a timetable! I have taken it upon myself to help you with this.", "Why hello there human, It is my pleasure to make your acquaintance."]
@@ -42,11 +41,12 @@ def make():
     message = {
       'text': f'{intro} Please enter your subjects and how long you want to study them for {author}. (subject for x hours, subject2 for x hours and subject3 for x hours).',
       'author': 'Timetabler',
-      'state': 'subjects'
+      'state': {'progress': 'subjects', 'author': author}
     }
     return jsonify(message)
   state = data['state']
-  if state == 'subjects':
+  if state['progress'] == 'subjects':
+    author = state['author']
     storedData = get_data().json()
     data = request.get_json()
     subs = re.split(', | and ', data['text'])
@@ -63,13 +63,13 @@ def make():
     message = {
       'text': f'Ok, subjects entered {author}.Would you like to study on weekends?',
       'author': 'Timetabler',
-      'state': 'weekend'
+      'state': {'progress': 'weekend', 'author': author}
     }
     return jsonify(message)  
-  elif state == 'weekend': #nice
+  elif state['progress'] == 'weekend': #nice
+    author = state['author']
     storedData = get_data().json()
     data = request.get_json()
-    author = data['author'] or 'liam'
     text = data['text']
     if 'will' in text or 'yes' in text or 'can ' in text or 'yeet' in text or 'affirm' in text or 'sure' in text or 'sounds good' in text or 'sounds like a plan' in text or 'fine' in text:
       weekend = True
@@ -82,13 +82,13 @@ def make():
     message = {
       'text': f'Ok, you {phraseyboi} study on weekends, what times do you want to study?',
       'author': 'Timetabler',
-      'state': 'times'
+      'state': {'progress': 'times', 'author': author}
     }
     return jsonify(message)
-  elif state == 'times':
+  elif state['progress'] == 'times':
+    author = state['author']
     storedData = get_data().json()
     data = request.get_json()
-    author = data['author'] or 'liam'
     times = data['text']
     times = times.split()
     if times[0][-2:] == 'am':
@@ -106,7 +106,7 @@ def make():
       else:
         time2 = 1200
     if time2 <= time1:
-      return jsonify({'text':'hey there fine human, it seems that you are trying to study past midnight, this is bad for your mental and physical health, so I am saying no.', 'state': 'times', 'author':'Timetabler'})
+      return jsonify({'text':'hey there fine human, it seems that you are trying to study past midnight, this is bad for your mental and physical health, so I am saying no.', 'state': {'progress': 'times', 'author': author}, 'author':'Timetabler'})
     storedData[author]['study'] = [time1, time2]
     post_data(storedData)
     message = {
