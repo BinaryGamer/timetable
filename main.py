@@ -40,7 +40,7 @@ def make():
     phrases = ["Ok human, i hear you\'re looking to make a timetable ey? i\'ve seen many a travellers try, but none return, luckily you have me to help you!", "Goodevening fine human, i have heard over the airways that you are trying to make a timetable! I have taken it upon myself to help you with this.", "Why hello there human, It is my pleasure to make your acquaintance."]
     intro = random.choice(phrases)
     message = {
-      'text': f'{intro} Please enter your subjects and how long you want to study them for {author}. (subject for x hours, subject2 for x hours and subject3 for x hours',
+      'text': f'{intro} Please enter your subjects and how long you want to study them for {author}. (subject for x hours, subject2 for x hours and subject3 for x hours).',
       'author': 'Timetabler',
       'state': 'subjects'
     }
