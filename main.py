@@ -49,7 +49,7 @@ def make():
     author = state['author']
     storedData = get_data().json()
     data = request.get_json()
-    subs = re.split(', | and ', data['text'])
+    subs = re.split(', | and | & ', data['text'])
     print(subs)
     subjects = {}
     for sub in subs:
@@ -71,7 +71,7 @@ def make():
     storedData = get_data().json()
     data = request.get_json()
     text = data['text']
-    if 'will' in text or 'yes' in text or 'can ' in text or 'yeet' in text or 'affirm' in text or 'sure' in text or 'sounds good' in text or 'sounds like a plan' in text or 'fine' in text:
+    if ('will' in text or 'yes' in text or 'can ' in text or 'yeet' in text or 'affirm' in text or 'sure' in text or 'sounds good' in text or 'sounds like a plan' in text or 'fine' in text) and ('opposite' not in text and 'n\'t' not in text):
       weekend = True
       phraseyboi = 'will'
     else:
@@ -110,7 +110,7 @@ def make():
     storedData[author]['study'] = [time1, time2]
     post_data(storedData)
     message = {
-      'text': 'Ok, please type print timetable to see your timetable!!',
+      'text': 'Ok, please type print to see your timetable!!',
       'author': 'Timetabler'
     }
     return jsonify(message)
