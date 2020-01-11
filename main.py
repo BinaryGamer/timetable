@@ -19,7 +19,7 @@ def reset_data():
   data = {
   "frank":{"subjects":{"english":4, "physics":7, "maths":10},
            "weekends": False, 
-           "study": [900, 1500]
+           "study": [1000, 1500]
   }
   }
   if k == 'y':
@@ -40,7 +40,7 @@ def make():
     phrases = ["Ok human, i hear you\'re looking to make a timetable ey? i\'ve seen many a travellers try, but none return, luckily you have me to help you!", "Goodevening fine human, i have heard over the airways that you are trying to make a timetable! I have taken it upon myself to help you with this.", "Why hello there human, It is my pleasure to make your acquaintance."]
     intro = random.choice(phrases)
     message = {
-      'text': f'{intro} Please enter your subjects and how long you want to study them for {author}.',
+      'text': f'{intro} Please enter your subjects and how long you want to study them for {author}. (subject for x hours, subject2 for x hours and subject3 for x hours',
       'author': 'Timetabler',
       'state': 'subjects'
     }
@@ -54,7 +54,7 @@ def make():
     subjects = {}
     for sub in subs:
       sub = sub.split(' for ')
-      subjects[sub[0]] = sub[1].split()[0]
+      subjects[sub[0]] = int(sub[1].split()[0])
     pprint(subjects)
     print(author, author in storedData, storedData)
     storedData[author]['subjects'] = subjects
@@ -94,14 +94,20 @@ def make():
     if times[0][-2:] == 'am':
       time1 = int(times[0][0:-2])*100
     else:
-      time1 = int(times[0][0:-2])*100+1200
+      if int(times[0][0:-2]) != 12:
+        time1 = int(times[0][0:-2])*100+1200
+      else:
+        time1 = 1200
     if times[2][-2:] == 'am':
       time2 = int(times[2][0:-2])*100
     else:
-      time2 = int(times[2][0:-2])*100+1200
+      if int(times[2][0:-2]) != 12:
+        time2 = int(times[2][0:-2])*100+1200
+      else:
+        time2 = 1200
     if time2 <= time1:
       return jsonify({'text':'hey there fine human, it seems that you are trying to study past midnight, this is bad for your mental and physical health, so I am saying no.', 'state': 'times', 'author':'Timetabler'})
-    storedData[author]['time'] = [time1, time2]
+    storedData[author]['study'] = [time1, time2]
     post_data(storedData)
     message = {
       'text': 'Ok, please type print timetable to see your timetable!!',
